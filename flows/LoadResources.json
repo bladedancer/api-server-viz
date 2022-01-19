@@ -1,0 +1,352 @@
+{
+	"schemaVersion": "4",
+	"info": {
+		"name": "Load Instances",
+		"description": "Loads the API Server instances."
+	},
+	"parameter": {
+		"properties": {
+			"request": {
+				"description": "The request"
+			},
+			"config": {
+				"type": "object",
+				"description": "The service's configuration"
+			},
+			"env": {
+				"type": "object",
+				"description": "The host OS environment"
+			}
+		},
+		"additionalProperties": false
+	},
+	"start": "delay.1",
+	"nodes": {
+		"resource.1": {
+			"type": "nodehandler://api-builder-flow-invoke/model/resource",
+			"name": "Query Resource Definitions",
+			"method": "query",
+			"parameters": [
+				{
+					"name": "where",
+					"type": "string",
+					"value": "\"{\\\"kind\\\": \\\"ResourceDefinition\\\"}\"",
+					"metaName": "where",
+					"metaDescription": "JSON-encoded object specifying field constraints. The field name is the key and the value is the constraint statement or value."
+				},
+				{
+					"name": "sel",
+					"type": "object",
+					"value": "{\"name\":1, \"metadata.scope.name\":1, \"spec.kind\": 1, \"spec.scope.kind\": 1, \"spec.plural\": 1}",
+					"metaName": "sel",
+					"metaDescription": "A dictionary of key-value pairs describing which fields to include in the query results. The field name is the key and the value is set to 1."
+				},
+				{
+					"name": "limit",
+					"type": "number",
+					"value": "1000",
+					"metaName": "limit",
+					"metaDescription": "The number of records to fetch."
+				}
+			],
+			"outputs": {
+				"next": {
+					"routes": [
+						"condition.1"
+					],
+					"context": "$.resourceDefinitions",
+					"metaName": "Next"
+				},
+				"error": {
+					"routes": [
+						"condition.1"
+					],
+					"context": "$.error",
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Query"
+		},
+		"delay.1": {
+			"type": "nodehandler://axway-flow/delay",
+			"name": "Fake",
+			"method": "delay",
+			"parameters": [
+				{
+					"name": "delay",
+					"type": "number",
+					"value": "0",
+					"metaName": "Delay",
+					"metaDescription": "The length of delay, in milliseconds."
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.delayed",
+					"routes": [
+						"resource.1",
+						"resource.2"
+					],
+					"metaName": "Next"
+				}
+			},
+			"metaMethod": "Delay"
+		},
+		"resource.2": {
+			"type": "nodehandler://api-builder-flow-invoke/model/resource",
+			"name": "Query Resource Definition Versions",
+			"method": "query",
+			"parameters": [
+				{
+					"name": "sel",
+					"type": "object",
+					"value": "{\"spec.name\": 1, \"spec.resourceDefinition\": 1}",
+					"metaName": "sel",
+					"metaDescription": "A dictionary of key-value pairs describing which fields to include in the query results. The field name is the key and the value is set to 1."
+				},
+				{
+					"name": "where",
+					"type": "string",
+					"value": "\"{\\\"kind\\\": \\\"ResourceDefinitionVersion\\\"}\"",
+					"metaName": "where",
+					"metaDescription": "JSON-encoded object specifying field constraints. The field name is the key and the value is the constraint statement or value."
+				},
+				{
+					"name": "limit",
+					"type": "number",
+					"value": "1000",
+					"metaName": "limit",
+					"metaDescription": "The number of records to fetch."
+				}
+			],
+			"outputs": {
+				"next": {
+					"routes": [
+						"condition.1"
+					],
+					"context": "$.resourceDefinitionVersions",
+					"metaName": "Next"
+				},
+				"error": {
+					"routes": [
+						"condition.1"
+					],
+					"context": "$.error",
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Query"
+		},
+		"condition.1": {
+			"type": "nodehandler://axway-flow/condition",
+			"name": "IsError",
+			"method": "exists",
+			"parameters": [
+				{
+					"name": "source",
+					"type": "jsonpath",
+					"value": "$.error",
+					"metaName": "Source",
+					"metaDescription": "The input to test."
+				}
+			],
+			"outputs": {
+				"true": {
+					"routes": [
+						"invoke-flow-response.1"
+					],
+					"context": "$.exists",
+					"metaName": "True"
+				},
+				"false": {
+					"routes": [
+						"javascript.1"
+					],
+					"context": "$.exists",
+					"metaName": "False"
+				}
+			},
+			"metaMethod": "Exists"
+		},
+		"invoke-flow-response.1": {
+			"type": "nodehandler://@axway/api-builder-plugin-invoke-flow/invoke-flow-response",
+			"name": "Error",
+			"method": "setResponse",
+			"parameters": [
+				{
+					"name": "data",
+					"type": "jsonpath",
+					"value": "$.error",
+					"metaName": "Data",
+					"metaDescription": "The result to be returned to the flow that called `Invoke Flow`."
+				},
+				{
+					"name": "isError",
+					"type": "boolean",
+					"value": "true",
+					"metaName": "Is Error",
+					"metaDescription": "Indicates that the response is an error.  This will cause the `Invoke Flow` to trigger the `Error` output with this value."
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.response",
+					"routes": [],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.error",
+					"routes": [],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Set Response"
+		},
+		"javascript.1": {
+			"type": "nodehandler://@axway/api-builder-plugin-fn-javascript/javascript",
+			"name": "FormatUrls",
+			"method": "Execute",
+			"parameters": [
+				{
+					"name": "data",
+					"type": "jsonpath",
+					"value": "$",
+					"metaName": "Data",
+					"metaDescription": "The value to apply as the `data` argument of the JavaScript code. For objects and arrays, `data` is passed by reference."
+				},
+				{
+					"name": "code",
+					"type": "string",
+					"value": "\"var fields = [ \\\"name\\\", \\\"kind\\\", \\\"group\\\", \\\"apiVersion\\\", \\\"metadata\\\" ];\\n  // Note, on the definitions, metadata.scope.name === group\\n  var resourceDefinitions = data.resourceDefinitions;\\n  var resourceDefinitionVersions = data.resourceDefinitionVersions;\\n  var urls = [];\\n\\n  resourceDefinitions.forEach(resourceDefinition => {\\n    var defname = resourceDefinition.name;\\n    var group = resourceDefinition.metadata.scope.name;\\n    var plural = resourceDefinition.spec.plural;\\n    \\n    // Definitions are already loaded.\\n    if (group === 'definitions') {\\n      return;\\n    }\\n    \\n    resourceDefinitionVersions.filter(ver => ver.spec.resourceDefinition === defname).forEach(ver => {\\n        urls.push({ \\n          url: `/${group}/${ver.spec.name}/${plural}`,\\n          fields\\n        });\\n    });\\n  });\\n\\n  return urls;\""
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.urls",
+					"routes": [
+						"invoke-flow.1"
+					],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.error",
+					"routes": [
+						"invoke-flow-response.1"
+					],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Execute"
+		},
+		"invoke-flow.1": {
+			"type": "nodehandler://@axway/api-builder-plugin-invoke-flow/invoke-flow",
+			"name": "Load Resources",
+			"method": "invokeFlowForEach",
+			"parameters": [
+				{
+					"name": "id",
+					"type": "string",
+					"value": "\"LoadResources\"",
+					"metaName": "Flow Listener ID",
+					"metaDescription": "The ID of a previously configured `Flow Listener`."
+				},
+				{
+					"name": "items",
+					"type": "jsonpath",
+					"value": "$.urls",
+					"metaName": "Items",
+					"metaDescription": "An array of input items where each item will be passed as request data when invoking the flow."
+				}
+			],
+			"outputs": {
+				"next": {
+					"routes": [
+						"javascript.2"
+					],
+					"context": "$.flowResponseArray",
+					"metaName": "Next"
+				},
+				"error": {
+					"routes": [
+						"invoke-flow-response.1"
+					],
+					"context": "$.error",
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Invoke Flow (for-each)"
+		},
+		"javascript.2": {
+			"type": "nodehandler://@axway/api-builder-plugin-fn-javascript/javascript",
+			"name": "Execute",
+			"method": "Execute",
+			"parameters": [
+				{
+					"name": "code",
+					"type": "string",
+					"value": "\"return data.flat();\"",
+					"metaName": "Code",
+					"metaDescription": "A JavaScript function body. Supports `await` and returning promises. `data` is the value of the Data parameter. `logger` is the API Builder logger. See the docs for more info: https://docs.axway.com/bundle/api-builder/page/docs/developer_guide/flows/flow_nodes/javascript_flow_node/index.html"
+				},
+				{
+					"name": "data",
+					"type": "jsonpath",
+					"value": "$.flowResponseArray",
+					"metaName": "Data",
+					"metaDescription": "The value to apply as the `data` argument of the JavaScript code. For objects and arrays, `data` is passed by reference."
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.flowResponse",
+					"routes": [
+						"invoke-flow-response.2"
+					],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.error",
+					"routes": [
+						"invoke-flow-response.1"
+					],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Execute"
+		},
+		"invoke-flow-response.2": {
+			"type": "nodehandler://@axway/api-builder-plugin-invoke-flow/invoke-flow-response",
+			"name": "Success",
+			"method": "setResponse",
+			"parameters": [
+				{
+					"name": "data",
+					"type": "jsonpath",
+					"value": "$.flowResponse",
+					"metaName": "Data",
+					"metaDescription": "The result to be returned to the flow that called `Invoke Flow`."
+				},
+				{
+					"name": "isError",
+					"type": "boolean",
+					"value": "false",
+					"metaName": "Is Error",
+					"metaDescription": "Indicates that the response is an error.  This will cause the `Invoke Flow` to trigger the `Error` output with this value."
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.response",
+					"routes": [],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.error",
+					"routes": [],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Set Response"
+		}
+	}
+}

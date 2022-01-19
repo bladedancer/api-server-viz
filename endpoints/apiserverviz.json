@@ -1,0 +1,50 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "API Server Resource Viz",
+    "description": "Visualization of API Server Resources.",
+    "version": "1.0.0"
+  },
+  "host": "localhost",
+  "schemes": [
+    "http"
+  ],
+  "basePath": "/viz/v1",
+  "paths": {
+    "/groups": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "The get succeeded, and the results are available.",
+            "schema": {}
+          },
+          "400": {
+            "description": "Bad request."
+          },
+          "401": {
+            "description": "This request requires user authentication, as configured by the server."
+          },
+          "404": {
+            "description": "No results were found."
+          },
+          "500": {
+            "description": "Something went wrong during the request; check out the logs on your server."
+          }
+        },
+        "description": "List all groups",
+        "operationId": "ListGroups",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "groups"
+        ],
+        "x-flow": "Definitions"
+      }
+    }
+  }
+}

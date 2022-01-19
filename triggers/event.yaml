@@ -1,0 +1,12 @@
+triggers:
+  event-1:
+    name: Event Consumer
+    parameters:
+      event: loadInstances
+    enabled: true
+    invoke:
+      flow: LoadResources
+      parameters:
+        request: $.request
+        config: $.config
+        env: $.env

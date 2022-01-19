@@ -1,0 +1,12 @@
+triggers:
+  timer-1:
+    name: Timer
+    parameters:
+      startImmediately: 'true'
+      interval: '30000'
+    enabled: true
+    invoke:
+      flow: InitializeCache
+      parameters:
+        config: $.config
+        env: $.env

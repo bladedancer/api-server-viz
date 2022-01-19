@@ -1,0 +1,56 @@
+triggers:
+  flow-listener-1:
+    name: Flow Listener
+    parameters:
+      id: APIServerRequest
+    enabled: true
+    invoke:
+      flow: APIServerRequest
+      parameters:
+        request: $.request
+        config: $.config
+        env: $.env
+  flow-listener-2:
+    name: Flow Listener
+    parameters:
+      id: createResource
+    enabled: true
+    invoke:
+      flow: CreateResource
+      parameters:
+        request: $.request
+        config: $.config
+        env: $.env
+  flow-listener-3:
+    name: Flow Listener
+    parameters:
+      id: LoadResources
+    enabled: true
+    invoke:
+      flow: LoadPaginatedAPIServerModels
+      parameters:
+        request: $.request
+        config: $.config
+        env: $.env
+  flow-listener-4:
+    name: Flow Listener
+    parameters:
+      id: loadInstances
+    enabled: true
+    invoke:
+      flow: LoadResources
+      parameters:
+        request: $.request
+        config: $.config
+        env: $.env
+  flow-listener-5:
+    name: Flow Listener
+    parameters:
+      id: loadEverything
+    enabled: true
+    invoke:
+      flow: Definitions
+      parameters:
+        request: $.request
+        config: $.config
+        env: $.env

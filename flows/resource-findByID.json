@@ -1,0 +1,131 @@
+{
+	"schemaVersion": "4",
+	"info": {
+		"name": "resource-findByID",
+		"description": "Finds resource by ID"
+	},
+	"parameter": {
+		"properties": {
+			"params": {
+				"type": "object",
+				"description": "The parameters from the endpoint.",
+				"properties": {
+					"id": {
+						"description": "The resource ID",
+						"type": "string"
+					}
+				},
+				"required": [
+					"id"
+				]
+			},
+			"request": {
+				"type": "object",
+				"description": "The HTTP request."
+			},
+			"config": {
+				"type": "object",
+				"description": "The service's configuration"
+			},
+			"env": {
+				"type": "object",
+				"description": "The host OS environment"
+			}
+		},
+		"additionalProperties": false,
+		"required": [
+			"params",
+			"request",
+			"config",
+			"env"
+		]
+	},
+	"start": "model.findByID",
+	"nodes": {
+		"model.findByID": {
+			"type": "nodehandler://api-builder-flow-invoke/model/resource",
+			"method": "findByID",
+			"name": "Find resource",
+			"parameters": [
+				{
+					"name": "id",
+					"value": "$.params.id"
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.model",
+					"routes": [
+						"response.success"
+					]
+				},
+				"notfound": {
+					"routes": [
+						"response.error.notfound"
+					]
+				},
+				"error": {
+					"context": "$.error",
+					"routes": [
+						"response.error"
+					]
+				}
+			}
+		},
+		"response.success": {
+			"type": "nodehandler://axway-flow/http",
+			"name": "Success (HTTP 200)",
+			"method": "setresponse",
+			"parameters": [
+				{
+					"name": "status",
+					"value": "200",
+					"type": "number"
+				},
+				{
+					"name": "body",
+					"value": "$.model"
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.response"
+				}
+			}
+		},
+		"response.error.notfound": {
+			"type": "nodehandler://axway-flow/http",
+			"name": "Not Found (HTTP 404)",
+			"method": "setresponse",
+			"parameters": [
+				{
+					"name": "status",
+					"value": "404",
+					"type": "number"
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.response"
+				}
+			}
+		},
+		"response.error": {
+			"type": "nodehandler://axway-flow/http",
+			"name": "Bad Request (HTTP 400)",
+			"method": "setresponse",
+			"parameters": [
+				{
+					"name": "status",
+					"value": "400",
+					"type": "number"
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.response"
+				}
+			}
+		}
+	}
+}
