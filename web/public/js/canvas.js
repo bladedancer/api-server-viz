@@ -86,7 +86,7 @@ function simulate() {
 
     let simulation = d3.forceSimulation()
         .force('link', linkForce)
-        .force('collision', d3.forceCollide().radius(40))
+        .force('collision', d3.forceCollide().radius(20))
         .force('charge', d3.forceManyBody().distanceMax(500).strength(-100))
         .force('center', d3.forceCenter(width / 2, height / 2));
         

@@ -16,8 +16,27 @@
         <h1 class="display-4">API Server Visualization</h1>
         <p class="lead">This allows you to visualize the relationship between API Server resource defintions and instances.</p>
         <hr class="my-4">
-        <a id="definitions" class="btn btn-primary btn-lg" href="#" role="button">Defintions</a>
-        <a id="instances" class="btn btn-primary btn-lg" href="#" role="button">Instances</a>
+        <div class="row">
+          <div class="actions col">
+            <a id="definitions" class="btn btn-primary btn-lg" href="#" role="button">Defintions</a>
+            <a id="instances" class="btn btn-primary btn-lg" href="#" role="button">Instances</a>
+          </div>
+          <div class="options col"> 
+            <span>Show links for:</span>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="optionScope">
+              <label class="form-check-label" for="optionScope">Scopes</label>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="optionHard">
+              <label class="form-check-label" for="optionHard">Hard</label>
+            </div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="optionSoft">
+              <label class="form-check-label" for="optionSoft">Soft</label>
+            </div>
+          </div>
+        </div>
     </div>
 
     <div class="content container-fluid svg-container">

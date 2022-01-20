@@ -186,7 +186,8 @@ export async function getInstances(includedLinks = { scope: true, hard: true, so
     nodes.map(node => resources.find(resource => resource.id === node.id)) 
         .filter(resource => resource.metadata.references && resource.metadata.references.length > 0)
         .forEach(source => {
-            let refLinks = source.metadata.references.map(ref => {
+            let refLinks = [];
+            source.metadata.references.forEach(ref => {
                 let target = resources.find(target => target.metadata.id === ref.id);
                 if (!target) {
                     return; // if target is not visible
@@ -197,7 +198,7 @@ export async function getInstances(includedLinks = { scope: true, hard: true, so
                     return;
                 }
 
-                return {
+                refLinks.push({
                     source: source.id,
                     target: target.id,
                     kind: refType,
@@ -209,11 +210,10 @@ export async function getInstances(includedLinks = { scope: true, hard: true, so
                         scope: target.scope,
                         group: target.group
                     }
-                };
+                });
             });
             links = links.concat(refLinks)        
         });
-    console.log(links);
 
     return {
         nodes,
