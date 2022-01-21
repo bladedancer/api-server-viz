@@ -150,7 +150,7 @@ function renderSimulation(simulation) {
         .selectAll("text")
         .data(nodes)
         .enter().append("text")
-        .text(function (node) { return node.name })
+        .text(function (node) { return node.title })
         .attr("font-size", 15)
         .attr("dx", 15)
         .attr("data-toggle", "modal")
@@ -203,7 +203,7 @@ function getNodeColor(node, neighbors) {
     //     return neighbors.indexOf(node.id) > 1 ? 'blue' : 'green'
     // }
     
-    return nodeColors(node.scope || node.kind);
+    return nodeColors(node.scope || node.name);
 }
 
 

@@ -15,6 +15,7 @@ export async function getDefinitions(includedLinks = { scope: true, hard: true, 
             group: resDef.metadata.scope.name,
             kind: resDef.spec.kind,
             name: resDef.spec.kind,
+            title: resDef.spec.kind,
             apiVersion: ver.spec.name,
             selfLink: ver.metadata.selfLink
         };
@@ -141,7 +142,7 @@ function scopeLink(resourceDefinitions, resourceVersions, srcId, srcGroup, srcSc
 export async function getInstances(includedLinks = { scope: true, hard: true, soft: true}, groups = null) {
     let links = [];
 
-    let resourcesResponse = await fetch('/api/endpoints/resource/query?sel={"metadata.id":1,"metadata.scope.id":1,"metadata.scope.name":1,"metadata.references":1,"metadata.selfLink":1,"group":1,"kind":1,"name":1,"apiVersion":1}&limit=1000');
+    let resourcesResponse = await fetch('/api/endpoints/resource/query?sel={"metadata.id":1,"metadata.scope.id":1,"metadata.scope.name":1,"metadata.references":1,"metadata.selfLink":1,"group":1,"kind":1,"title":1, "name":1,"apiVersion":1}&limit=1000');
     let resources = await resourcesResponse.json();
      
     let nodes = resources
@@ -152,7 +153,8 @@ export async function getInstances(includedLinks = { scope: true, hard: true, so
                 scope: resource.metadata.scope ? resource.metadata.scope.name : null,
                 group: resource.group,
                 kind: resource.kind,
-                name: `${resource.name} (${resource.kind})`,
+                name: resource.name,
+                title: `${resource.title || resource.name} (${resource.kind})`,
                 apiVersion: resource.apiVersion,
                 selfLink: resource.metadata.selfLink
             };

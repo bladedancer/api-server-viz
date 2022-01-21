@@ -31,22 +31,12 @@ let config = {
 
 function displayDefinitions() {
     config.selection = "definitions";
-    // config.includedLinks = {
-    //     scope: true,
-    //     hard: true,
-    //     soft: true
-    // };
     config.groups = ["definitions"];
     window.dispatchEvent(new CustomEvent('updateType', { detail: config }));
 }
 
 function displayInstances() {
     config.selection = "instances";
-    // config.includedLinks = {
-    //     scope: true,
-    //     hard: false,
-    //     soft: false
-    // };
     config.groups = ["management", "catalog", "marketplace"];
     window.dispatchEvent(new CustomEvent('updateType', { detail: config }));
 }
