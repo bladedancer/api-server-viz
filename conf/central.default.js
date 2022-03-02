@@ -4,6 +4,6 @@
  */
 module.exports = {
 	apiserver: {
-		baseUrl: 'https://apicentral.axway.com/apis'
+		baseUrl: process.env.BASE_URL || 'https://apicentral.axway.com/apis'
 	}
 };

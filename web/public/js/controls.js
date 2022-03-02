@@ -1,5 +1,6 @@
 let config = {
     selection: "",
+    scopeFilter: "",
     includedLinks: {
         scope: false,
         hard: false,
@@ -26,6 +27,13 @@ let config = {
         window.dispatchEvent(new CustomEvent('updateType', { detail: config }));
     });
     
+    document.getElementById("scopeInput").addEventListener('change', (e) => { 
+        config.scopeFilter = e.target.value;
+        window.dispatchEvent(new CustomEvent('updateType', { detail: config }));
+    });
+
+    new ResizeObserver(() => window.dispatchEvent(new Event('resize'))).observe(document.getElementsByClassName("jumbotron-content")[0])
+
     window.dispatchEvent(new CustomEvent('updateType', { detail: config })); // init
 })();
 
