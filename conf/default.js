@@ -317,7 +317,7 @@ module.exports = {
 				type: 'oauth2',
 				flow: 'clientCredentials',
 				basic_auth: true,
-				token_url: 'https://login.axway.com/auth/realms/Broker/protocol/openid-connect/token',
+				token_url: process.env.TOKEN_URL || 'https://login.axway.com/auth/realms/Broker/protocol/openid-connect/token',
 				client_id: process.env.CLIENT_ID,
 				client_secret: process.env.CLIENT_SECRET,
 				access_token: null

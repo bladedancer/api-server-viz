@@ -8,6 +8,8 @@ let svgcontainer = document.querySelector('.svg-container');
 let width = svgcontainer.offsetWidth;
 let height = svgcontainer.offsetHeight;
 
+let simulation = null;
+
 let radius = {
     scope: 20,
     resource: 10
@@ -42,46 +44,73 @@ export async function update(config) {
     }
 
     nodeColors = scaleOrdinal(schemeCategory10).domain(nodes.filter(n => n.scopeId).map(n => n.scopeId))
-    simulate();
+    simulate(config);
     initZoom();
 }
 
-function simulate() {
+export async function updateForce(config) {
+    if (simulation) {
+        simulation.force("link")
+            .strength(linkStrength(config))
+            .distance(linkDistance(config));
+        simulation.alpha(1).restart();
+    }
+}
+
+export async function updateCharge(config) {
+    if (simulation) {
+        simulation.force('charge', chargeStrength(config));
+        simulation.alpha(1).restart();
+    }
+}
+
+function linkStrength(config) {
+    return (link) => {
+        if (link.kind === "scope") {
+            return config.force.scope;
+        } else if (link.kind === "soft") {
+            return config.force.soft;
+        } else if (link.kind === "hard") {
+            return config.force.hard;
+        }
+        return 0;
+    }
+}
+
+function linkDistance(config) {
+    return (link) => {
+        if (link.kind === "scope") {
+            return config.distance.scope;
+        } else if (link.kind === "soft") {
+            return config.distance.soft;
+        } else if (link.kind === "hard") {
+            return config.distance.hard;
+        }
+        return 0;
+    }
+}
+
+function chargeStrength(config) {
+    return d3.forceManyBody()
+        .strength( n => (n.scopeId ? config.charge.resource : config.charge.scope));
+}
+
+function simulate(config) {
     var i = 0;
     let linkForce = d3.forceLink()
         .links(links)
         .id((node) => node.id )
-        .strength((link) => {
-            if (link.kind === "scope") {
-                return 1;
-            } else if (link.kind === "soft") {
-                return 0.01;
-            } else if (link.kind === "hard") {
-                return 0.5;
-            }
-            return 0;
-        })
-        .distance((link) => {
-            if (link.kind === "scope") {
-                return radius.scope * 3;
-            } else if (link.kind === "soft") {
-                return radius.scope * 10;
-            } else if (link.kind === "hard") {
-                return radius.scope * 10;
-            }
-            return 0;
-        })
+        .strength(linkStrength(config))
+        .distance(linkDistance(config));
        
 
-    let simulation = d3.forceSimulation(nodes)
+    simulation = d3.forceSimulation(nodes)
         .force('link', linkForce)
-        .force('charge', d3.forceManyBody())
-        //.force("charge", d3.forceManyBody().strength( n => (n.scopeId ? -10 : -100)))
+        .force('charge', chargeStrength(config))
         .force('collision', 
             d3.forceCollide().radius((n,i) => n.scopeId ? radius.resource : radius.scope))
         .force('center', d3.forceCenter(width / 2, height / 2));
     renderSimulation(simulation);
-    
 }
 
 function renderSimulation(simulation) {
@@ -177,31 +206,7 @@ function handleZoom(e) {
 
 
 	  
-function onTick(node, link, text) {
-	// let alpha = this.alpha();
-    // let chargeStrength = (n) => {
-    //     if (alpha < 0.2) {
-    //         return 0;
-    //     } else if ( alpha > 0.9 ) {
-    //         return  20;
-    //     } else if ( alpha > 0.8 ) {
-    //         return  10;
-    //     }
-
-    //     if (!n.scopeId) {
-    //         return 1;
-    //     } else if ( alpha > 0.2 ) {
-    //         return (alpha - 0.2 / 0.6);
-    //     } else {
-    //         return 0;
-    //     }    
-    // }
-
-	// this.force("charge", d3.forceManyBody()
-    //     .distanceMax(600)
-    //     .strength( n => (n.scopeId ? -100 : -100) * chargeStrength(n)));
-	
-	
+function onTick(node, link, text) {	
     link
         .attr("x1", function(d) { return d.source.x; })
         .attr("y1", function(d) { return d.source.y; })

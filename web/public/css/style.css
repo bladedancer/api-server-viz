@@ -10,3 +10,8 @@ body {
 .content {
     flex: 1 1 auto;
 }
+
+.form-range label + input {
+    clear: left;
+    display: block
+}

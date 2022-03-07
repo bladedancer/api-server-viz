@@ -18,9 +18,47 @@
           <p class="lead">This allows you to visualize the relationship between API Server resource defintions and instances.</p>
           <hr class="my-4">
           <div class="row">
-            <div class="actions col">
+            <div class="actions col-4">
               <a id="definitions" class="btn btn-primary btn-lg" href="#" role="button">Defintions</a>
               <a id="instances" class="btn btn-primary btn-lg" href="#" role="button">Instances</a>
+            </div>
+            <div class="options col"> 
+              <div class="form-range">
+                <label for="scopeLinkForce">Scope Link Strength</label>
+                <input id="scopeLinkForce" type="range" min="0" max="1" step=".05" value="1" disabled/>
+              </div>
+              <div class="form-range">
+                <label for="hardLinkForce">Hard Link Strength</label>
+                <input id="hardLinkForce" type="range" min="0" max="1" step=".05" value="1" disabled/>
+              </div>
+              <div class="form-range">
+                <label for="softLinkForce">Soft Link Strength</label>
+                <input id="softLinkForce" type="range" min="0" max="1" step=".05" value="1" disabled/>
+              </div>
+            </div>
+            <div class="options col"> 
+              <div class="form-range">
+                <label for="scopeLinkDistance">Scope Link Distance</label>
+                <input id="scopeLinkDistance" type="range" min="0" max="300" step="1" value="30" disabled/>
+              </div>
+              <div class="form-range">
+                <label for="hardLinkDistance">Hard Link Distance</label>
+                <input id="hardLinkDistance" type="range" min="0" max="300" step="1" value="100" disabled/>
+              </div>
+              <div class="form-range">
+                <label for="softLinkDistance">Soft Link Strength</label>
+                <input id="softLinkDistance" type="range" min="0" max="300" step="1" value="10" disabled/>
+              </div>
+            </div>
+            <div class="options col"> 
+              <div class="form-range">
+                <label for="scopeCharge">Scope Charge</label>
+                <input id="scopeCharge" type="range" min="-100" max="100" step="1" value="-50"/>
+              </div>
+              <div class="form-range">
+                <label for="resourceCharge">Resource Charge</label>
+                <input id="resourceCharge" type="range" min="-100" max="100" step="1" value="-10"/>
+              </div>
             </div>
             <div class="options col"> 
               <div class="form-group">
