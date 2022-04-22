@@ -1,11 +1,25 @@
 import {JSONPath} from 'https://cdn.jsdelivr.net/gh/JSONPath-Plus/JSONPath@v6.0.1/dist/index-browser-esm.min.js';
 
-export async function getDefinitions(includedLinks = { scope: true, hard: true, soft: true}, groups = null, scopeFilter = null) {
-    let resourceVersionResponse = await fetch('/api/endpoints/resource/query?sel={"name":1,"metadata.selfLink":1,"spec":1}&where={"kind": "ResourceDefinitionVersion"}&limit=1000');
-    let resourceDefinitionResponse = await fetch('/api/endpoints/resource/query?sel={"metadata.scope.name":1,"metadata.selfLink":1,"spec.kind":1,"spec.scope.kind":1,"name":1}&where={"kind": "ResourceDefinition"}&limit=1000');
+async function fetchAll(path) {
+    let limit = 1000;
+    let offset = 0;
+    let hasMore = true;
+    let all = []; 
 
-    let resourceVersions = await resourceVersionResponse.json();
-    let resourceDefinitions = await resourceDefinitionResponse.json();
+    while (hasMore) {
+        let url = `${path}&limit=${limit}&skip=${offset}`; 
+        let response = await fetch(url);
+        let responseContent = await response.json();
+        all = all.concat(responseContent);
+        offset += limit;
+        hasMore = (responseContent.length == limit)
+    }
+    return all;
+}
+
+export async function getDefinitions(includedLinks = { scope: true, hard: true, soft: true}, groups = null, scopeFilter = null) {
+    let resourceVersions = await fetchAll('/api/endpoints/resource/query?sel={"name":1,"metadata.selfLink":1,"spec":1}&where={"kind": "ResourceDefinitionVersion"}');
+    let resourceDefinitions = await fetchAll('/api/endpoints/resource/query?sel={"metadata.scope.name":1,"metadata.selfLink":1,"spec.kind":1,"spec.scope.kind":1,"name":1}&where={"kind": "ResourceDefinition"}');
     
     let nodes = resourceVersions.map(ver => {
         let resDef = resourceDefinitions.find(def => def.name === ver.spec.resourceDefinition);
@@ -164,9 +178,7 @@ function scopeLink(resourceDefinitions, resourceVersions, srcId, srcGroup, srcSc
 
 export async function getInstances(includedLinks = { scope: true, hard: true, soft: true}, groups = null, scopeFilter = null) {
     let links = [];
-
-    let resourcesResponse = await fetch('/api/endpoints/resource/query?sel={"metadata.id":1,"metadata.scope.id":1,"metadata.scope.kind":1,"metadata.scope.name":1,"metadata.references":1,"metadata.selfLink":1,"group":1,"kind":1,"title":1, "name":1,"apiVersion":1}&limit=1000');
-    let resources = await resourcesResponse.json();
+    let resources = await fetchAll('/api/endpoints/resource/query?sel={"metadata.id":1,"metadata.scope.id":1,"metadata.scope.kind":1,"metadata.scope.name":1,"metadata.references":1,"metadata.selfLink":1,"group":1,"kind":1,"title":1, "name":1,"apiVersion":1}');
      
     let nodes = resources
         .filter(resource => !groups || groups.indexOf(resource.group) !== -1)
