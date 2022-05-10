@@ -9,12 +9,14 @@ let config = {
     force: {
         scope: 1,
         soft: 0.01,
-        hard: 0.5
+        hard: 0.5,
+        sameScopeHard: 0.5
     },
     distance: {
         scope: 30,
         soft: 100,
-        hard: 10
+        hard: 10,
+        sameScopeHard: 10
     },
     charge: {
         scope: -50,
@@ -43,10 +45,14 @@ let config = {
         config.includedLinks.hard = e.target.checked;
         if (config.includedLinks.hard) {
             document.getElementById("hardLinkForce").removeAttribute("disabled");
-            document.getElementById("hardLinkDistance").removeAttribute("disabled"); 
+            document.getElementById("hardLinkDistance").removeAttribute("disabled");
+            document.getElementById("sameScopeHardLinkForce").removeAttribute("disabled");
+            document.getElementById("sameScopeHardLinkDistance").removeAttribute("disabled"); 
         } else {
             document.getElementById("hardLinkForce").setAttribute("disabled", "true");
-            document.getElementById("hardLinkDistance").setAttribute("disabled", "true"); 
+            document.getElementById("hardLinkDistance").setAttribute("disabled", "true");
+            document.getElementById("sameScopeHardLinkForce").setAttribute("disabled", "true");
+            document.getElementById("sameScopeHardLinkDistance").setAttribute("disabled", "true"); 
         }
         window.dispatchEvent(new CustomEvent('updateType', { detail: config }));
     });
@@ -82,6 +88,15 @@ let config = {
     });
     document.getElementById("hardLinkDistance").addEventListener('change', (e) => { 
         config.distance.hard = +e.target.value;
+        window.dispatchEvent(new CustomEvent('updateForce', { detail: config }));
+    });
+
+    document.getElementById("sameScopeHardLinkForce").addEventListener('change', (e) => { 
+        config.force.sameScopeHard = +e.target.value;
+        window.dispatchEvent(new CustomEvent('updateForce', { detail: config }));
+    });
+    document.getElementById("sameScopeHardLinkDistance").addEventListener('change', (e) => { 
+        config.distance.sameScopeHard = +e.target.value;
         window.dispatchEvent(new CustomEvent('updateForce', { detail: config }));
     });
 

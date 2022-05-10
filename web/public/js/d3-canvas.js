@@ -71,7 +71,11 @@ function linkStrength(config) {
         } else if (link.kind === "soft") {
             return config.force.soft;
         } else if (link.kind === "hard") {
-            return config.force.hard;
+            if (link.source.scopeName && link.source.scopeName === link.target.scopeName) {
+                return config.force.sameScopeHard;
+            } else {
+                return config.force.hard;    
+            }
         }
         return 0;
     }
@@ -84,7 +88,11 @@ function linkDistance(config) {
         } else if (link.kind === "soft") {
             return config.distance.soft;
         } else if (link.kind === "hard") {
-            return config.distance.hard;
+            if (link.source.scopeName && link.source.scopeName === link.target.scopeName) {
+                return config.distance.sameScopeHard;
+            } else {
+                return config.distance.hard;    
+            }
         }
         return 0;
     }
