@@ -1,6 +1,7 @@
 let config = {
     selection: "",
     scopeFilter: "",
+    mergeVersions: false,
     includedLinks: {
         scope: false,
         hard: false,
@@ -10,13 +11,15 @@ let config = {
         scope: 1,
         soft: 0.01,
         hard: 0.5,
-        sameScopeHard: 0.5
+        sameScopeHard: 0,
+        sameScopeSoft: 0
     },
     distance: {
         scope: 30,
         soft: 100,
         hard: 10,
-        sameScopeHard: 10
+        sameScopeHard: 10,
+        sameScopeSoft: 10
     },
     charge: {
         scope: -50,
@@ -28,6 +31,11 @@ let config = {
 (function handlers() {
     document.getElementById("definitions").onclick = displayDefinitions;
     document.getElementById("instances").onclick = displayInstances;
+    
+    document.getElementById("optionMerge").addEventListener('change', (e) => { 
+        config.mergeVersions = e.target.checked;
+        window.dispatchEvent(new CustomEvent('updateType', { detail: config }));
+    });
 
     document.getElementById("optionScope").addEventListener('change', (e) => { 
         config.includedLinks.scope = e.target.checked;
@@ -61,9 +69,13 @@ let config = {
         if (config.includedLinks.soft) {
             document.getElementById("softLinkForce").removeAttribute("disabled");
             document.getElementById("softLinkDistance").removeAttribute("disabled"); 
+            document.getElementById("sameScopeSoftLinkForce").removeAttribute("disabled");
+            document.getElementById("sameScopeSoftLinkDistance").removeAttribute("disabled"); 
         } else {
             document.getElementById("softLinkForce").setAttribute("disabled", "true"); 
             document.getElementById("softLinkDistance").setAttribute("disabled", "true"); 
+            document.getElementById("sameScopeSoftLinkForce").setAttribute("disabled", "true");
+            document.getElementById("sameScopeSoftLinkDistance").setAttribute("disabled", "true"); 
         }
         window.dispatchEvent(new CustomEvent('updateType', { detail: config }));
     });
@@ -106,6 +118,15 @@ let config = {
     });
     document.getElementById("softLinkDistance").addEventListener('change', (e) => { 
         config.distance.soft = +e.target.value;
+        window.dispatchEvent(new CustomEvent('updateForce', { detail: config }));
+    });
+
+    document.getElementById("sameScopeSoftLinkForce").addEventListener('change', (e) => { 
+        config.force.sameScopeSoft = +e.target.value;
+        window.dispatchEvent(new CustomEvent('updateForce', { detail: config }));
+    });
+    document.getElementById("sameScopeSoftLinkDistance").addEventListener('change', (e) => { 
+        config.distance.sameScopeSoft = +e.target.value;
         window.dispatchEvent(new CustomEvent('updateForce', { detail: config }));
     });
 

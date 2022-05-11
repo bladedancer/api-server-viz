@@ -33,11 +33,15 @@
               </div>
               <div class="form-range">
                 <label for="sameScopeHardLinkForce">Hard Link Strength (Same Scope)</label>
-                <input id="sameScopeHardLinkForce" type="range" min="0" max="1" step=".05" value="1" disabled/>
+                <input id="sameScopeHardLinkForce" type="range" min="0" max="1" step=".05" value="0" disabled/>
               </div>
               <div class="form-range">
                 <label for="softLinkForce">Soft Link Strength</label>
                 <input id="softLinkForce" type="range" min="0" max="1" step=".05" value="1" disabled/>
+              </div>
+              <div class="form-range">
+                <label for="sameScopeSoftLinkForce">Soft Link Strength (Same Scope)</label>
+                <input id="sameScopeSoftLinkForce" type="range" min="0" max="1" step=".05" value="0" disabled/>
               </div>
             </div>
             <div class="options col"> 
@@ -47,7 +51,7 @@
               </div>
               <div class="form-range">
                 <label for="hardLinkDistance">Hard Link Distance</label>
-                <input id="hardLinkDistance" type="range" min="0" max="300" step="1" value="100" disabled/>
+                <input id="hardLinkDistance" type="range" min="0" max="600" step="1" value="100" disabled/>
               </div>
               <div class="form-range">
                 <label for="sameScopeHardLinkDistance">Hard Link Distance (Same Scope)</label>
@@ -55,17 +59,21 @@
               </div>
               <div class="form-range">
                 <label for="softLinkDistance">Soft Link Distance</label>
-                <input id="softLinkDistance" type="range" min="0" max="300" step="1" value="10" disabled/>
+                <input id="softLinkDistance" type="range" min="0" max="600" step="1" value="10" disabled/>
+              </div>
+              <div class="form-range">
+                <label for="sameScopeSoftLinkDistance">Soft Link Distance (Same Scope)</label>
+                <input id="sameScopeSoftLinkDistance" type="range" min="0" max="300" step="1" value="100" disabled/>
               </div>
             </div>
             <div class="options col"> 
               <div class="form-range">
                 <label for="scopeCharge">Scope Charge</label>
-                <input id="scopeCharge" type="range" min="-100" max="100" step="1" value="-50"/>
+                <input id="scopeCharge" type="range" min="-200" max="200" step="1" value="-50"/>
               </div>
               <div class="form-range">
                 <label for="resourceCharge">Resource Charge</label>
-                <input id="resourceCharge" type="range" min="-100" max="100" step="1" value="-10"/>
+                <input id="resourceCharge" type="range" min="-200" max="200" step="1" value="-10"/>
               </div>
             </div>
             <div class="options col"> 
@@ -86,6 +94,10 @@
               <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" id="optionSoft">
                 <label class="form-check-label" for="optionSoft">Soft</label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="optionMerge">
+                <label class="form-check-label" for="optionMerge">Merge Versions</label>
               </div>
             </div>
           </div>

@@ -31,7 +31,7 @@ window.onresize = () => {
 export async function update(config) {
     document.querySelector('.svg-container svg').replaceChildren();
     if (config.selection === "definitions") {
-        let res = await apiserver.getDefinitions(config.includedLinks, config.groups, config.scopeFilter);
+        let res = await apiserver.getDefinitions({...config.includedLinks, merge: config.mergeVersions}, config.groups, config.scopeFilter);
         nodes = res.nodes;
         links = res.links;
     } else if (config.selection === "instances") {
@@ -69,7 +69,11 @@ function linkStrength(config) {
         if (link.kind === "scope") {
             return config.force.scope;
         } else if (link.kind === "soft") {
-            return config.force.soft;
+            if (link.source.scopeName && link.source.scopeName === link.target.scopeName) {
+                return config.force.sameScopeSoft;
+            } else {
+                return config.force.soft;    
+            }
         } else if (link.kind === "hard") {
             if (link.source.scopeName && link.source.scopeName === link.target.scopeName) {
                 return config.force.sameScopeHard;
@@ -86,7 +90,11 @@ function linkDistance(config) {
         if (link.kind === "scope") {
             return config.distance.scope;
         } else if (link.kind === "soft") {
-            return config.distance.soft;
+            if (link.source.scopeName && link.source.scopeName === link.target.scopeName) {
+                return config.distance.sameScopeSoft;
+            } else {
+                return config.distance.soft;    
+            }
         } else if (link.kind === "hard") {
             if (link.source.scopeName && link.source.scopeName === link.target.scopeName) {
                 return config.distance.sameScopeHard;

@@ -17,25 +17,32 @@ async function fetchAll(path) {
     return all;
 }
 
-export async function getDefinitions(includedLinks = { scope: true, hard: true, soft: true}, groups = null, scopeFilter = null) {
+export async function getDefinitions(includedLinks = { scope: true, hard: true, soft: true, merge: false}, groups = null, scopeFilter = null) {
     let resourceVersions = await fetchAll('/api/endpoints/resource/query?sel={"name":1,"metadata.selfLink":1,"spec":1}&where={"kind": "ResourceDefinitionVersion"}');
     let resourceDefinitions = await fetchAll('/api/endpoints/resource/query?sel={"metadata.scope.name":1,"metadata.selfLink":1,"spec.kind":1,"spec.scope.kind":1,"name":1}&where={"kind": "ResourceDefinition"}');
-    
-    let nodes = resourceVersions.map(ver => {
+
+    let nodesById = resourceVersions.reduce((acc, ver, i) => {
         let resDef = resourceDefinitions.find(def => def.name === ver.spec.resourceDefinition);
-        return {
-            id: ver.id,
-            scopeName: null,
-            scopeKind: resDef.spec.scope ? resDef.spec.scope.kind : null,
-            scopeId: null,
-            group: resDef.metadata.scope.name,
-            kind: resDef.spec.kind,
-            name: resDef.spec.kind,
-            title: resDef.spec.kind + ' (' + ver.spec.name + ')',
-            apiVersion: ver.spec.name,
-            selfLink: ver.metadata.selfLink
-        };
-    });
+        let merge = includedLinks.merge;
+        let id = merge ? resDef.id : ver.id;
+        if (!acc[id]) {
+            acc[id] = {
+                id: id,
+                scopeName: null,
+                scopeKind: resDef.spec.scope ? resDef.spec.scope.kind : null,
+                scopeId: null,
+                group: resDef.metadata.scope.name,
+                kind: resDef.spec.kind,
+                name: resDef.spec.kind,
+                title: resDef.spec.kind + (merge ? '' : ' (' + ver.spec.name + ')'),
+                apiVersion: merge ? null : ver.spec.name,
+                selfLink: merge ? null : ver.metadata.selfLink
+            };
+        }
+        return acc;
+    }, {}); 
+
+    let nodes = Object.values(nodesById);
 
     nodes.filter(n => n.scopeKind).forEach(n => {
         let scope = nodes.find(s => s.kind === n.scopeKind && s.group === n.group  );
@@ -114,32 +121,53 @@ export async function getDefinitions(includedLinks = { scope: true, hard: true, 
                     && def.apiVersion === srcDef.apiVersion
                     && def.spec.scope.kind && def.spec.scope.kind === (scope || srcScope)) || (!def.spec.scope && !scope)));
             
-            // For each targeted resource definition, add a link to ever version of it.
-            let targetResDefVers = resourceVersions.filter(ver => ver.spec.resourceDefinition === targetResDef.name);
-
-            targetResDefVers.forEach(targetResDefVer => {
+            if (includedLinks.merge) {
                 links.push({
-                    source: ver.id,
-                    target: targetResDefVer.id,
+                    source: srcDef.id,
+                    target: targetResDef.id,
                     kind: refType,
                     sourceResource: {
-                        apiVersion: srcDef.apiVersion,
+                        apiVersion: null,
                         kind: srcDef.kind,
                         scope: srcScope,
                         group: srcGroup
                     },
                     targetResource: {
-                        apiVersion: targetResDef.apiVersion,
+                        apiVersion: null,
                         kind: targetResDef.kind,
                         scope: targetResDef.spec.scope && targetResDef.spec.scope.kind,
                         group: targetResDef.metadata.scope.name
                     }
                 });
-            });
+            } else {
+                // For each targeted resource definition, add a link to ever version of it.
+                let targetResDefVers = resourceVersions.filter(ver => ver.spec.resourceDefinition === targetResDef.name);
+
+                targetResDefVers.forEach(targetResDefVer => {
+                    links.push({
+                        source: ver.id,
+                        target: targetResDefVer.id,
+                        kind: refType,
+                        sourceResource: {
+                            apiVersion: srcDef.apiVersion,
+                            kind: srcDef.kind,
+                            scope: srcScope,
+                            group: srcGroup
+                        },
+                        targetResource: {
+                            apiVersion: targetResDef.apiVersion,
+                            kind: targetResDef.kind,
+                            scope: targetResDef.spec.scope && targetResDef.spec.scope.kind,
+                            group: targetResDef.metadata.scope.name
+                        }
+                    });
+                });
+            }
         });
         links = links.concat(refLinks);
     });
 
+    console.log(links);
     return {
         nodes,
         links
