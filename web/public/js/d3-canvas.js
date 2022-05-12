@@ -64,18 +64,23 @@ export async function updateCharge(config) {
     }
 }
 
+function linkToSameScope(link) {
+    return ((link.source.scopeName && link.source.scopeName === link.target.scopeName) 
+                || (link.source.scopeId && link.source.scopeId === link.target.scopeId));
+}
+
 function linkStrength(config) {
     return (link) => {
         if (link.kind === "scope") {
             return config.force.scope;
         } else if (link.kind === "soft") {
-            if (link.source.scopeName && link.source.scopeName === link.target.scopeName) {
+            if (linkToSameScope(link)) {
                 return config.force.sameScopeSoft;
             } else {
                 return config.force.soft;    
             }
         } else if (link.kind === "hard") {
-            if (link.source.scopeName && link.source.scopeName === link.target.scopeName) {
+            if (linkToSameScope(link)) {
                 return config.force.sameScopeHard;
             } else {
                 return config.force.hard;    
@@ -90,13 +95,13 @@ function linkDistance(config) {
         if (link.kind === "scope") {
             return config.distance.scope;
         } else if (link.kind === "soft") {
-            if (link.source.scopeName && link.source.scopeName === link.target.scopeName) {
+            if (linkToSameScope(link)) {
                 return config.distance.sameScopeSoft;
             } else {
                 return config.distance.soft;    
             }
         } else if (link.kind === "hard") {
-            if (link.source.scopeName && link.source.scopeName === link.target.scopeName) {
+            if (linkToSameScope(link)) {
                 return config.distance.sameScopeHard;
             } else {
                 return config.distance.hard;    
